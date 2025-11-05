@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+:root {
+    --background: #fef7f9;
+    --foreground: #4a1c2f;
+    --primary: #722F37;
+    --primary-foreground: #ffffff;
+    --muted: #f5f0f2;
+    --border: #e8d4d9;
+}
+
+.dark {
+    --background: #1a0c10;
+    --foreground: #f8e9ed;
+    --primary: #a84d5b;
+    --primary-foreground: #ffffff;
+    --muted: #2c181d;
+    --border: #4a2a32;
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Бордовые акценты для активных ссылок */
+.nav-active {
+    color: #722F37;
+    font-weight: 600;
+}
+
+.nav-inactive {
+    color: #8B5E6B;
+    transition: color 0.2s;
+}
+
+    .nav-inactive:hover {
+        color: #722F37;
+    }
+
+/* Современные градиенты и тени */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Плавные анимации */
+* {
+    transition-property: color, background-color, border-color, transform, box-shadow;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Кастомный скроллбар */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #be185d;
+    border-radius: 3px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #9d174d;
+    }
