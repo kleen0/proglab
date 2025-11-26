@@ -1,91 +1,141 @@
 "use client";
 
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from "@heroui/react";
-import { usePathname } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import {
+    Navbar,
+    NavbarBrand,
+    NavbarContent,
+    NavbarItem,
+    Link,
+    Button
+} from "@heroui/react";
+import { usePathname } from "next/navigation";
+import LoginModal from "@/components/UI/modals/LoginModal";
+import RegistrationModal from "@/components/UI/modals/RegistrationModal";
 
-export const WhiteLotusLogo = () => {
-    return (
-        <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">🦷</span>
-            </div>
-            <div className="flex flex-col">
-                <span className="font-bold text-gray-900 text-base">Белый Лотос</span>
-                <span className="text-teal-600 text-xs">Стоматология</span>
-            </div>
+export const WhiteLotusLogo = () => (
+    <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center">
+            <span className="text-white font-bold text-sm">🦷</span>
         </div>
-    );
-};
+        <div className="flex flex-col leading-none">
+            <span className="font-bold text-gray-900 text-sm">Белый Лотос</span>
+            <span className="text-teal-600 text-xs">Стоматология</span>
+        </div>
+    </div>
+);
 
 export default function Header() {
     const pathname = usePathname();
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
+
+    // Ленивый инициализатор: безопасно берём имя из localStorage (только на клиенте)
+    const [userName, setUserName] = useState<string | null>(() => {
+        try {
+            if (typeof window !== "undefined") {
+                return localStorage.getItem("auth_name");
+            }
+        } catch {
+            // ignore (например, строгие политики)
+        }
+        return null;
+    });
+
+    // optional: синхронизировать в случае, если другие части приложения меняют localStorage
+    useEffect(() => {
+        const onStorage = (e: StorageEvent) => {
+            if (e.key === "auth_name") {
+                setUserName(e.newValue);
+            }
+            if (e.key === "auth_token" && e.newValue === null) {
+                // токен удалён — разлогинились в другом табе
+                setUserName(null);
+            }
+        };
+        window.addEventListener("storage", onStorage);
+        return () => window.removeEventListener("storage", onStorage);
+    }, []);
+
+    const handleLoginSuccess = (name?: string) => {
+        if (name) setUserName(name);
+    };
+
+    const logout = () => {
+        try {
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("auth_name");
+        } catch { }
+        setUserName(null);
+    };
 
     const navItems = [
         { href: "/", label: "Главная" },
         { href: "/services", label: "Услуги" },
         { href: "/doctors", label: "Врачи" },
-        { href: "/contacts", label: "Контакты" }
+        { href: "/contacts", label: "Контакты" },
     ];
 
     return (
-        <Navbar
-            className="bg-white border-b border-gray-100"
-            maxWidth="full"
-            shouldHideOnScroll={false}
-            height="70px"
-        >
-            {/* Контакты слева */}
-            <NavbarContent justify="start" className="flex-1">
-                <NavbarItem className="hidden lg:flex">
-                    <a
-                        href="tel:+77771234567"
-                        className="text-gray-700 hover:text-teal-600 transition-colors font-medium text-sm"
-                    >
+        <>
+            <header className="w-full bg-white border-b border-gray-100">
+                <div className="mx-auto max-w-7xl px-4">
+                    <div className="grid grid-cols-3 items-center h-[70px]">
+                        <div className="flex items-center justify-start">
+                            <WhiteLotusLogo />
+                        </div>
 
-                    </a>
-                </NavbarItem>
-            </NavbarContent>
+                        <nav className="flex items-center justify-center">
+                            <ul className="flex gap-8">
+                                {navItems.map((item) => (
+                                    <li key={item.href}>
+                                        <Link
+                                            href={item.href}
+                                            className={`font-medium text-sm transition-colors duration-200 ${pathname === item.href ? "text-teal-600" : "text-gray-600 hover:text-teal-500"
+                                                }`}
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </nav>
 
-            {/* Логотип и меню по центру */}
-            <NavbarContent className="flex items-center gap-12" justify="center">
-                {/* Логотип */}
-                <NavbarBrand>
-                    <WhiteLotusLogo />
-                </NavbarBrand>
+                        <div className="flex items-center justify-end gap-4">
+                            {userName ? (
+                                <>
+                                    <span className="hidden sm:inline-block mr-2">Привет, {userName}</span>
+                                    <Button onPress={logout} variant="bordered">Выйти</Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button
+                                        onPress={() => setIsLoginModalOpen(true)}
+                                        className="text-teal-600 border-teal-600 font-medium text-sm px-4 py-2 rounded-lg hover:bg-teal-50 transition-colors"
+                                        variant="bordered"
+                                    >
+                                        Вход
+                                    </Button>
 
-                {/* Меню с оптимизированным массивом */}
-                <NavbarContent className="hidden lg:flex gap-8" justify="center">
-                    {navItems.map((item) => (
-                        <NavbarItem key={item.href}>
-                            <Link
-                                href={item.href}
-                                className={`
-                                    font-medium text-sm transition-colors duration-200
-                                    ${pathname === item.href
-                                        ? 'text-teal-600'
-                                        : 'text-gray-600 hover:text-teal-500'
-                                    }
-                                `}
-                            >
-                                {item.label}
-                            </Link>
-                        </NavbarItem>
-                    ))}
-                </NavbarContent>
-            </NavbarContent>
+                                    <Button
+                                        onPress={() => setIsRegistrationModalOpen(true)}
+                                        className="bg-teal-500 text-white font-medium text-sm px-4 py-2 rounded-lg hover:bg-teal-600 transition-colors"
+                                        variant="solid"
+                                    >
+                                        Регистрация
+                                    </Button>
+                                </>
+                            )}
+                            <Button isDisabled className="bg-teal-500 text-white font-medium text-sm px-5 py-2 rounded-lg opacity-50" variant="solid">
+                                Записаться
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </header>
 
-            {/* Кнопка записи справа */}
-            <NavbarContent justify="end" className="flex-1">
-                <NavbarItem>
-                    <Button
-                        isDisabled
-                        className="bg-teal-500 text-white font-medium text-sm px-5 py-2 rounded-lg opacity-50"
-                        variant="solid"
-                    >
-                        Записаться
-                    </Button>
-                </NavbarItem>
-            </NavbarContent>
-        </Navbar>
+            <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} onLoginSuccess={handleLoginSuccess} />
+            <RegistrationModal isOpen={isRegistrationModalOpen} onClose={() => setIsRegistrationModalOpen(false)} onRegistered={() => setIsRegistrationModalOpen(false)} />
+        </>
     );
 }
