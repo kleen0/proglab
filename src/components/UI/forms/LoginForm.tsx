@@ -40,7 +40,8 @@ export default function LoginForm({ onClose, onLoginSuccess }: Props) {
                 const j = await res.json().catch(() => ({}));
                 setErr(j.error || "Неверный логин или пароль");
             }
-        } catch (err) {
+        } catch {
+            // Исправлено: удалена неиспользуемая переменная err
             // Если нет backend — примем любой логин для демонстрации:
             // localStorage.setItem("auth_name", email);
             // onLoginSuccess?.(email.split("@")[0]);
@@ -73,14 +74,14 @@ export default function LoginForm({ onClose, onLoginSuccess }: Props) {
             </div>
 
             <style jsx>{`
-        .cm-form { display:flex; flex-direction:column; gap:12px; }
-        .cm-label { font-size:13px; color:#334155; display:flex; flex-direction:column; gap:8px; }
-        .cm-input { padding:10px 12px; border-radius:8px; border:1px solid #e6e9ef; background:#fbfdff; font-size:14px; }
-        .cm-error { color:#b91c1c; font-size:13px; margin-top:4px }
-        .cm-btn { padding:10px 14px; border-radius:8px; font-weight:600; border:0; cursor:pointer }
-        .cm-btn-ghost { background:#f3f4f6; color:#0f172a; border:1px solid #e6e9ef }
-        .cm-btn-primary { background:linear-gradient(90deg,#14b8a6,#0ea5e9); color:#fff }
-      `}</style>
+                .cm-form { display:flex; flex-direction:column; gap:12px; }
+                .cm-label { font-size:13px; color:#334155; display:flex; flex-direction:column; gap:8px; }
+                .cm-input { padding:10px 12px; border-radius:8px; border:1px solid #e6e9ef; background:#fbfdff; font-size:14px; }
+                .cm-error { color:#b91c1c; font-size:13px; margin-top:4px }
+                .cm-btn { padding:10px 14px; border-radius:8px; font-weight:600; border:0; cursor:pointer }
+                .cm-btn-ghost { background:#f3f4f6; color:#0f172a; border:1px solid #e6e9ef }
+                .cm-btn-primary { background:linear-gradient(90deg,#14b8a6,#0ea5e9); color:#fff }
+            `}</style>
         </form>
     );
 }
