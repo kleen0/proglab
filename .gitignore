@@ -47,3 +47,4 @@ ehthumbs.db
 
 # Visual Studio
 .vs/
+/src/generated/prisma
